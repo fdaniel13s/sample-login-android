@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,9 +51,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CounterTheme {
-                var txtUsu by remember { mutableStateOf("Default user") }
-                var txtPas by remember { mutableStateOf("You can't modify  !") }
+                var txtUsu by remember { mutableStateOf("") }
+                var txtPas by remember { mutableStateOf("") }
                 var passwordVisibility by remember { mutableStateOf(false) }
+                var showDialog by remember { mutableStateOf(false) }
 
                 Column(
                     modifier = Modifier
@@ -59,13 +62,13 @@ class MainActivity : ComponentActivity() {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TopAppBar( title = { Text(text = "First Login-UPC") },
+                    TopAppBar(title = { Text(text = "   Login UPC - Challenge Week 2") },
                         navigationIcon = {
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Home"
                             )
-                        } )
+                        })
 
 
                     val imageModifier: Modifier = Modifier
@@ -74,9 +77,11 @@ class MainActivity : ComponentActivity() {
                         .align(Alignment.CenterHorizontally)
 
                     //Image from Drawable
-                    Image(painter = painterResource(id = R.drawable.icon),
+                    Image(
+                        painter = painterResource(id = R.drawable.icon),
                         contentDescription = "Logo",
-                        modifier = imageModifier)
+                        modifier = imageModifier
+                    )
 
 
 
@@ -108,7 +113,9 @@ class MainActivity : ComponentActivity() {
                         trailingIcon = {
                             IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                                 Icon(
-                                    imageVector = Icons.Default.Person,
+                                    painter = if (passwordVisibility) painterResource(id = R.drawable.eye)
+                                    else painterResource(id = R.drawable.visibility_off),
+                                    modifier = Modifier.size(24.dp),
                                     contentDescription = "Visibility"
                                 )
                             }
@@ -120,14 +127,38 @@ class MainActivity : ComponentActivity() {
                         else PasswordVisualTransformation()
                     )
 
-                    fun onClick(){
-                        //Go to MainActivity2
-                        val navigate = Intent(this@MainActivity, MainActivity2::class.java)
-                        startActivity(navigate)
+                    fun validateUser(): Boolean {
+                        return txtUsu == "Jose Perez" && txtPas == "UPC123"
+                    }
+
+
+                    fun onClick() {
+                        if (validateUser()) {
+                            val navigate = Intent(this@MainActivity, MainActivity2::class.java)
+                            startActivity(navigate)
+                        } else {
+                            showDialog = true
+                        }
+
                     }
 
                     Button(onClick = { onClick() }) {
                         Text("Login")
+                    }
+
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            title = { Text("Error") },
+                            text = { Text("Invalid username or password") },
+                            confirmButton = {
+                                Button(
+                                    onClick = { showDialog = false }
+                                ) {
+                                    Text("OK")
+                                }
+                            }
+                        )
                     }
                 }
             }
