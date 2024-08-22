@@ -134,7 +134,11 @@ class MainActivity : ComponentActivity() {
 
                     fun onClick() {
                         if (validateUser()) {
-                            val navigate = Intent(this@MainActivity, MainActivity2::class.java)
+                            val navigate = Intent(this@MainActivity,
+                                MainActivity2::class.java).apply {
+                                    putExtra("username", txtUsu)
+                                    putExtra("password", txtPas)
+                            }
                             startActivity(navigate)
                         } else {
                             showDialog = true
@@ -148,14 +152,14 @@ class MainActivity : ComponentActivity() {
 
                     if (showDialog) {
                         AlertDialog(
-                            onDismissRequest = { showDialog = false },
+                            onDismissRequest = { showDialog = true },
                             title = { Text("Error") },
                             text = { Text("Invalid username or password") },
                             confirmButton = {
                                 Button(
                                     onClick = { showDialog = false }
                                 ) {
-                                    Text("OK")
+                                    Text("Try Again")
                                 }
                             }
                         )
